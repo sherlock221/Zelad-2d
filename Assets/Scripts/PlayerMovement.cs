@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlayerStatus
+{
+	walk,
+	attack,
+	interact
+}
+
 public class PlayerMovement : MonoBehaviour {
 
 	private Rigidbody2D mRigidbody2d;
@@ -9,22 +16,46 @@ public class PlayerMovement : MonoBehaviour {
 	private Vector3 dir;
 	public float Speed;
 
+	private PlayerStatus  mCurrentStatus;
+
+
 	private void Awake () {
 		this.mRigidbody2d = GetComponent<Rigidbody2D> ();
 		this.mAnimator = GetComponent<Animator>();
+		this.mCurrentStatus = PlayerStatus.walk;
 	}
 
 	// Use this for initialization
 	void Start () {
-
+				
 	}
-
+ 
 	// Update is called once per frame
 	void Update () {
 		dir = Vector3.zero;
 		dir.x = Input.GetAxisRaw ("Horizontal");
 		dir.y = Input.GetAxisRaw ("Vertical");
-		this.UpdateAnimationMove();
+
+
+		 //判断不进行重复攻击
+		if(Input.GetKeyDown(KeyCode.Space) && this.mCurrentStatus != PlayerStatus.attack){
+			StartCoroutine(AttackCo());
+		}
+		else if(mCurrentStatus == PlayerStatus.walk){
+			this.UpdateAnimationMove();
+		}	
+
+
+			
+	}
+
+	private IEnumerator  AttackCo(){		
+		mAnimator.SetBool("attacking",true);
+		mCurrentStatus = PlayerStatus.attack;	
+		yield return null;	
+		mAnimator.SetBool("attacking",false);	
+		yield return new WaitForSeconds(0.3f);			
+		mCurrentStatus = PlayerStatus.walk;
 	}
 
 	private void UpdateAnimationMove(){
