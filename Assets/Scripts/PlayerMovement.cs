@@ -27,14 +27,16 @@ public class PlayerMovement : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-				
-	}
+		this.mAnimator.SetFloat("moveX",0);	
+		this.mAnimator.SetFloat("moveY",-1);			
+	} 
  
 	// Update is called once per frame
 	void Update () {
 		dir = Vector3.zero;
 		dir.x = Input.GetAxisRaw ("Horizontal");
 		dir.y = Input.GetAxisRaw ("Vertical");
+
 
 
 		 //判断不进行重复攻击
@@ -71,6 +73,8 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	private void Move () {
+		//向量归一化 斜向走过快做归一化处理
+		dir.Normalize();	
 		this.mRigidbody2d.MovePosition (transform.position + dir * this.Speed * Time.deltaTime);
 	}
 }
