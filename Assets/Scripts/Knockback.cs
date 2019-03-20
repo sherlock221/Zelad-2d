@@ -32,10 +32,10 @@ public class Knockback : MonoBehaviour
         if(other.CompareTag("enemy")){
             Rigidbody2D enemyRigidbody = other.GetComponent<Rigidbody2D>();
             enemyRigidbody.isKinematic = false;   
-            Vector2 diff = gameObject.transform.position - other.transform.position;
-            diff = diff.normalized  * Thrust; 
+            Vector2 diff =  other.transform.position - gameObject.transform.position;
+            diff = diff  * Thrust; 
             Debug.Log(diff);           
-            enemyRigidbody.AddForce(diff,ForceMode2D.Force);  
+            enemyRigidbody.AddForce(diff,ForceMode2D.Impulse);  
             StartCoroutine(KnockCo(enemyRigidbody));   
         }
     }
