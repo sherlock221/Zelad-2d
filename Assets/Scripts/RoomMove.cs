@@ -29,7 +29,7 @@ public class RoomMove : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other) {
         Debug.Log("2d.");
 
-        if(other.CompareTag("Player")){
+        if(other.CompareTag("Player") && !other.isTrigger){
             mCameraMovement.MinPos += CameraChange;
             mCameraMovement.MaxPos += CameraChange;
             other.transform.position += PlayerChange;

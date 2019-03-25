@@ -18,9 +18,6 @@ public class PlayerHit : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        if(other.CompareTag("breakable")){
-            Debug.Log("attc");
-            other.GetComponent<Pot>().Smash();
-        }
+       
     }
 }

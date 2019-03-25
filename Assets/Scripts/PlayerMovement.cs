@@ -4,9 +4,11 @@ using UnityEngine;
 
 public enum PlayerStatus
 {
+	idel,
 	walk,
 	attack,
-	interact
+	interact,
+	stagger
 }
 
 public class PlayerMovement : MonoBehaviour {
@@ -18,6 +20,15 @@ public class PlayerMovement : MonoBehaviour {
 
 	private PlayerStatus  mCurrentStatus;
 
+	public FloatValue currentHealth;
+
+	public Signal playerHealthSignal;
+
+
+	public PlayerStatus currentState {
+		get { return this.mCurrentStatus;}
+		set { this.mCurrentStatus = value;}
+	}
 
 	private void Awake () {
 		this.mRigidbody2d = GetComponent<Rigidbody2D> ();
@@ -28,7 +39,9 @@ public class PlayerMovement : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		this.mAnimator.SetFloat("moveX",0);	
-		this.mAnimator.SetFloat("moveY",-1);			
+		this.mAnimator.SetFloat("moveY",-1);	
+
+		this.currentHealth.initialValue = 10;		
 	} 
  
 	// Update is called once per frame
@@ -38,12 +51,11 @@ public class PlayerMovement : MonoBehaviour {
 		dir.y = Input.GetAxisRaw ("Vertical");
 
 
-
 		 //判断不进行重复攻击
-		if(Input.GetKeyDown(KeyCode.Space) && this.mCurrentStatus != PlayerStatus.attack){
+		if(Input.GetKeyDown(KeyCode.Space) && this.mCurrentStatus != PlayerStatus.attack && this.mCurrentStatus != PlayerStatus.stagger){
 			StartCoroutine(AttackCo());
 		}
-		else if(mCurrentStatus == PlayerStatus.walk){
+		else if(mCurrentStatus == PlayerStatus.walk || mCurrentStatus == PlayerStatus.idel){
 			this.UpdateAnimationMove();
 		}	
 
@@ -77,4 +89,28 @@ public class PlayerMovement : MonoBehaviour {
 		dir.Normalize();	
 		this.mRigidbody2d.MovePosition (transform.position + dir * this.Speed * Time.deltaTime);
 	}
+
+
+
+	public void Knock(float knockTime,float damage){
+		currentHealth.initialValue -= damage;
+		 playerHealthSignal.Raise();
+		if(currentHealth.initialValue > 0){			 
+			  StartCoroutine(KnockCo(knockTime));
+		}
+		else{
+			this.gameObject.SetActive(false);
+		}
+      
+    }
+
+        private IEnumerator KnockCo(float knockTime)
+    {
+        if (this.mRigidbody2d != null)
+        {
+            yield return new WaitForSeconds(knockTime);                                  
+            mRigidbody2d.velocity = Vector3.zero;
+            this.mCurrentStatus = PlayerStatus.idel;                    
+        }
+    }
 }
